@@ -398,19 +398,19 @@ func writeGraphite(dp DataPoint) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", carbonUrl)
 	if err != nil {
 		log.Error("ResolveTCPAddr failed:", err.Error())
+	} else {
+		conn, err := net.DialTCP("tcp", nil, tcpAddr)
+		if err != nil {
+			log.Error("Dial failed:", err.Error())
+		} else {
+		_, err = conn.Write([]byte(format2graphite(dp)))
+		if err != nil {
+			log.Error("Write to server failed:", err.Error())
+			}
+		}
+		log.Info("write to server =", format2graphite(dp))
+		conn.Close()
 	}
-
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		log.Error("Dial failed:", err.Error())
-	}
-
-	_, err = conn.Write([]byte(format2graphite(dp)))
-	if err != nil {
-		log.Error("Write to server failed:", err.Error())
-	}
-	log.Info("write to server =", format2graphite(dp))
-	conn.Close()
 
 }
 
